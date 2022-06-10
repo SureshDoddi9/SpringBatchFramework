@@ -25,7 +25,7 @@ public class SecondJobScheduler {
     @Autowired
     Job secondJob;
 
-    @Scheduled(cron = "0 0/1 * 1/1 * ?")
+    //@Scheduled(cron = "0 0/1 * 1/1 * ?")
     public void  secondJobstarter() throws Exception {
         Map<String, JobParameter> params = new HashMap<>();
         params.put("CurrentSeconds", new JobParameter(Instant.now().getEpochSecond()));
