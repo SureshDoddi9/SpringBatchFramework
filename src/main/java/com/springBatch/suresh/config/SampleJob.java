@@ -2,7 +2,10 @@ package com.springBatch.suresh.config;
 
 import com.springBatch.suresh.listener.FirstJobListener;
 import com.springBatch.suresh.listener.FirstStepListener;
+import com.springBatch.suresh.processor.FirstItemProcessor;
+import com.springBatch.suresh.reader.FirstItemReader;
 import com.springBatch.suresh.service.ThirdTasklet;
+import com.springBatch.suresh.writer.FirstItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -34,6 +37,15 @@ public class SampleJob {
     @Autowired
     public FirstStepListener firstStepListener;
 
+    @Autowired
+    public FirstItemReader firstItemReader;
+
+    @Autowired
+    public FirstItemProcessor firstItemProcessor;
+
+    @Autowired
+    public FirstItemWriter firstItemWriter;
+
     @Bean
     public Job firstJob(){
         return jobBuilderFactory.get("First Job")
@@ -44,6 +56,8 @@ public class SampleJob {
                 .listener(firstJobListener)
                 .build();
     }
+
+
 
     public Step firstStep(){
        return stepBuilderFactory.get("First step")
@@ -85,5 +99,24 @@ public class SampleJob {
                 return RepeatStatus.FINISHED;
             }
         };
+    }
+
+    //=========================================================
+    //Chunk Oriented step
+    @Bean
+    public Job secondJob(){
+       return jobBuilderFactory.get("Second Job")
+                .incrementer(new RunIdIncrementer())
+                .start(firstChunkStep())
+                .build();
+    }
+
+    public Step firstChunkStep(){
+        return stepBuilderFactory.get("First Chunk step")
+                .<Integer,Long>chunk(3)
+                .reader(firstItemReader)
+                .processor(firstItemProcessor)
+                .writer(firstItemWriter)
+                .build();
     }
 }
